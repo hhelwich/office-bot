@@ -1,0 +1,20 @@
+{
+  "name": "office-bot",
+  "version": "0.0.0",
+  "description": "Hennis office bot",
+  "author": "Hendrik Helwich <hendrik@helwich.de>",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/hhelwich/office-bot.git"
+  },
+  "dependencies": {
+    "express": "^4.12.2",
+    "mongoose": "^3.8.24"
+  },
+  "devDependencies": {
+    "gulp": "^3.8.11",
+    "gulp-express": "^0.3.2",
+    "gulp-traceur": "^0.17.0"
+  },
+  "license": "MIT"
+}
