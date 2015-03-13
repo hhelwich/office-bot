@@ -9,14 +9,17 @@
   },
   "dependencies": {
     "express": "^4.12.2",
-    "mongoose": "^3.8.24"
+    "mongoose": "^3.8.24",
+    "tingodb": "^0.3.4",
+    "tungus": "0.0.4"
   },
   "devDependencies": {
     "gulp": "^3.8.11",
     "gulp-express": "^0.3.2",
     "gulp-traceur": "^0.17.0",
     "gulp-traceur-cmdline": "^1.1.4",
-    "gulp-uglify": "^1.1.0"
+    "gulp-uglify": "^1.1.0",
+    "gulp-jshint": "~1.9.2"
   },
   "license": "MIT"
 }
