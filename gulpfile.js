@@ -2,7 +2,7 @@ var gulp = require("gulp");
 var traceurCl = require("gulp-traceur-cmdline");
 var traceur = require("gulp-traceur");
 var uglify = require("gulp-uglify");
-git 
+
 gulp.task("traceur browser", function(done) {
   gulp.src("src/browser.js").pipe(traceurCl({
     modules : "inline",
