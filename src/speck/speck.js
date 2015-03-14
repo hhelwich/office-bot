@@ -1,5 +1,3 @@
-let hasProp = {}.hasOwnProperty;
-
 // Binds a function to a context
 // :: (->, {}) -> ->
 let bind = (fn, context) => {
@@ -13,16 +11,14 @@ let _console = console;
 let log = bind(_console.log, _console);
 let error = bind(_console.error, _console);
 
-let _ref = Array.prototype;
-let slice = _ref.slice;
-let push = _ref.push;
+let { slice, push } = Array.prototype;
 
 if (typeof TEST !== "undefined" && TEST !== null && TEST) {
-  console.log("test mode on");
+  log("test mode on");
 }
 
 if (typeof DEBUG !== "undefined" && DEBUG !== null && DEBUG) {
-  console.log("debug mode on");
+  log("debug mode on");
 }
 
 // Returns true if the given value is of type boolean and is true.
@@ -227,10 +223,9 @@ let removeListener = (obs, lid) => {};
 // :: ((string -> *), ((string, *) ->)) ->
 let iterate = (obj, callback) => {
   for (let key in obj) {
-    if (!hasProp.call(obj, key)) {
-      continue;
+    if (obj.hasOwnProperty(key)) {
+      callback(key, obj[key]);
     }
-    callback(key, obj[key]);
   }
 };
 
