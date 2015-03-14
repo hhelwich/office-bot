@@ -1,24 +1,24 @@
-var Obs, Observable, addListener, appendArray, async, bind, compose, copyArray, createSequence, curry, curryObs, error,
-  globals, isEmpty, isFunc, isObservable, isTrue, iterate, listenerId, log, nop, objLength, obsListeners, obsProto,
-  observableId, onNext, push, pushValues, removeListener, slice, toArray, toFunc, trigger, triggerEnd, triggerError,
-  waitForArgs, waitForObs, _console, _ref, __hasProp = {}.hasOwnProperty;
+var Obs, Observable, addListener, createSequence,
+  globals, isObservable, iterate, listenerId, obsListeners, obsProto,
+  observableId, onNext, pushValues, removeListener, trigger, triggerEnd, triggerError,
+  __hasProp = {}.hasOwnProperty;
 
 // Binds a function to a context
 // :: (->, {}) -> ->
-bind = (fn, context) => {
-  return () => {
+let bind = (fn, context) => {
+  return function() {
     return fn.apply(context, arguments);
   };
 };
 
 // Aliases
-_console = console;
-log = bind(_console.log, _console);
-error = bind(_console.error, _console);
+let _console = console;
+let log = bind(_console.log, _console);
+let error = bind(_console.error, _console);
 
-_ref = Array.prototype;
-slice = _ref.slice;
-push = _ref.push;
+let _ref = Array.prototype;
+let slice = _ref.slice;
+let push = _ref.push;
 
 if (typeof TEST !== "undefined" && TEST !== null && TEST) {
   console.log("test mode on");
@@ -30,13 +30,13 @@ if (typeof DEBUG !== "undefined" && DEBUG !== null && DEBUG) {
 
 // Returns true if the given value is of type boolean and is true.
 // * -> boolean
-isTrue = (value) => {
+let isTrue = (value) => {
   return value === true;
 };
 
 // Add the given function to the message queue.
 // :: (->) ->
-async = (f) => {
+let async = (f) => {
   setTimeout(() => {
     onNext();
     return f();
@@ -45,17 +45,17 @@ async = (f) => {
 
 // Function that does nothing
 // :: ->
-nop = () => {};
+let nop = () => {};
 
 // Returns `true` if the given value is a function.
 // :: * -> boolean
-isFunc = (f) => {
+let isFunc = (f) => {
   return typeof f === "function";
 };
 
 // Returns a function. A function input is returned directly, Other values will result in a function that does nothing.
 // :: * -> ->
-toFunc = (f) => {
+let toFunc = (f) => {
   if (isFunc(f)) {
     return f;
   } else {
@@ -65,40 +65,40 @@ toFunc = (f) => {
 
 // Convert an argument object to an array.
 // :: Arguments -> [*]
-toArray = (args) => {
+let toArray = (args) => {
   return slice.call(args, 0);
 };
 
 // Shallow copy an array.
 // :: [*] -> [*]
-copyArray = (array) => {
+let copyArray = (array) => {
   return array.slice();
 };
 
 // Appends content of second array to the end of the first array. Returns the changed first array.
 // :: ([*], [*]) -> [*]
-appendArray = (a1, a2) => {
+let appendArray = (a1, a2) => {
   push.apply(a1, a2);
   return a1;
 };
 
 // Returns the number of own key/value pairs in the given object.
 // :: {} -> number
-objLength = (obj) => {
+let objLength = (obj) => {
   return (Object.keys(obj)).length;
 };
 
 // Returns true if the given object has no own key/value pair.
 // :: {} -> boolean
-isEmpty = (obj) => {
+let isEmpty = (obj) => {
   return objLength(obj) === 0;
 };
 
 // Function composition
-compose = () => {
+let compose = function() {
   var fns;
   fns = toArray(arguments);
-  return () => {
+  return function() {
     var fn, result, _i;
     result = (fns.pop()).apply(null, arguments);
     for (_i = fns.length - 1; _i >= 0; _i += -1) {
@@ -112,8 +112,8 @@ compose = () => {
 // Call the given function if the last `n` elements of the `args` array are instances of `Obs`, otherwise return a
 // function which waits for more arguments to be appended on the current arguments.
 // (->, [*], number) -> ->
-waitForObs = (fn, args, n) => {
-  return () => {
+let waitForObs = (fn, args, n) => {
+  return function() {
     var args2, i, len, _i, _j;
     args2 = appendArray(copyArray(args), arguments);
     len = args2.length;
@@ -132,25 +132,25 @@ waitForObs = (fn, args, n) => {
 
 // Return a function which calls the given function if its last `n` arguments are instances of Obs, otherwise return a
 // function which waits for more arguments to be appended on the given arguments.
-curryObs = (n, fn) => {
+let curryObs = (n, fn) => {
   return waitForObs(fn, [], n);
 };
 
 // Call the given function if enough arguments are given, otherwise return function which waits for more arguments.
 // :: (->, [*]) -> *
-waitForArgs = (fn, args) => {
+let waitForArgs = (fn, args) => {
   if (args.length >= fn.length) {
     return fn.apply(null, args);
   } else {
-    return () => {
+    return function() {
       return waitForArgs(fn, args.concat(toArray(arguments)));
     };
   }
 };
 
 // Function currying
-curry = (fn) => {
-  return () => {
+let curry = (fn) => {
+  return function() {
     return waitForArgs(fn, toArray(arguments));
   };
 };
@@ -262,7 +262,7 @@ triggerEnd = (oid) => {
 
 // Internal Observable constructor function
 // :: (->) -> Obs<T>
-Obs = () => {
+Obs = function() {
   this._id = observableId();
 };
 
@@ -398,7 +398,7 @@ globals = {
 
 // Prototype for all Observables.
 Obs.prototype = obsProto = {
-  log: (prefix) => {
+  log: function(prefix) {
     addListener(this, (value) => {
       log(prefix, value);
     }, (e) => {
@@ -407,16 +407,16 @@ Obs.prototype = obsProto = {
       log(prefix, "<end>");
     });
   },
-  forEach: (onValue, onError, onEnd) => {
+  forEach: function(onValue, onError, onEnd) {
     return addListener(this, onValue, onError, onEnd);
   },
-  map: (fn) => {
+  map: function(fn) {
     return globals.map(fn, this);
   },
-  filter: (predicate) => {
+  filter: function(predicate) {
     return globals.filter(predicate, this);
   },
-  take: (count) => {
+  take: function(count) {
     return globals.take(count, this);
   }
 };
