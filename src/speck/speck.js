@@ -1,4 +1,4 @@
-let __hasProp = {}.hasOwnProperty;
+let hasProp = {}.hasOwnProperty;
 
 // Binds a function to a context
 // :: (->, {}) -> ->
@@ -98,14 +98,11 @@ let isEmpty = (obj) => {
 
 // Function composition
 let compose = function() {
-  let fns;
-  fns = toArray(arguments);
+  let fns = toArray(arguments);
   return function() {
-    let fn, result, _i;
-    result = (fns.pop()).apply(null, arguments);
-    for (_i = fns.length - 1; _i >= 0; _i += -1) {
-      fn = fns[_i];
-      result = fn(result);
+    let result = (fns.pop()).apply(null, arguments);
+    for (let i = fns.length - 1; i >= 0; i += -1) {
+      result = fns[i](result);
     }
     return result;
   };
@@ -141,16 +138,15 @@ let isObservable = (obs) => {
 // (->, [*], number) -> ->
 let waitForObs = (fn, args, n) => {
   return function() {
-    let args2, i, len, _i, _j;
-    args2 = appendArray(copyArray(args), arguments);
-    len = args2.length;
-    for (i = _i = n; _i >= 1; i = _i += -1) {
+    let args2 = appendArray(copyArray(args), arguments);
+    let len = args2.length;
+    for (let i = n; i >= 1; i += -1) {
       if (!isObservable(args2[len - i])) {
         return waitForObs(fn, args2, n);
       }
     }
     // The last n arguments are Observables => call function but move Observables from tail to head
-    for (i = _j = 0; _j < n; i = _j += 1) {
+    for (let i = 0; i < n; i += 1) {
       args2.unshift(args2.pop());
     }
     return fn.apply(null, args2);
@@ -232,7 +228,7 @@ let removeListener = (obs, lid) => {};
 let iterate = (obj, callback) => {
   let key, value;
   for (key in obj) {
-    if (!__hasProp.call(obj, key)) {
+    if (!hasProp.call(obj, key)) {
       continue;
     }
     value = obj[key];
