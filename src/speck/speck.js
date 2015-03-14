@@ -5,8 +5,8 @@ var Obs, Observable, addListener, appendArray, async, bind, compose, copyArray, 
 
 // Binds a function to a context
 // :: (->, {}) -> ->
-bind = function(fn, context) {
-  return function() {
+bind = (fn, context) => {
+  return () => {
     return fn.apply(context, arguments);
   };
 };
@@ -30,14 +30,14 @@ if (typeof DEBUG !== "undefined" && DEBUG !== null && DEBUG) {
 
 // Returns true if the given value is of type boolean and is true.
 // * -> boolean
-isTrue = function(value) {
+isTrue = (value) => {
   return value === true;
 };
 
 // Add the given function to the message queue.
 // :: (->) ->
-async = function(f) {
-  setTimeout(function() {
+async = (f) => {
+  setTimeout(() => {
     onNext();
     return f();
   }, 0);
@@ -45,17 +45,17 @@ async = function(f) {
 
 // Function that does nothing
 // :: ->
-nop = function() {};
+nop = () => {};
 
 // Returns `true` if the given value is a function.
 // :: * -> boolean
-isFunc = function(f) {
+isFunc = (f) => {
   return typeof f === "function";
 };
 
 // Returns a function. A function input is returned directly, Other values will result in a function that does nothing.
 // :: * -> ->
-toFunc = function(f) {
+toFunc = (f) => {
   if (isFunc(f)) {
     return f;
   } else {
@@ -65,40 +65,40 @@ toFunc = function(f) {
 
 // Convert an argument object to an array.
 // :: Arguments -> [*]
-toArray = function(args) {
+toArray = (args) => {
   return slice.call(args, 0);
 };
 
 // Shallow copy an array.
 // :: [*] -> [*]
-copyArray = function(array) {
+copyArray = (array) => {
   return array.slice();
 };
 
 // Appends content of second array to the end of the first array. Returns the changed first array.
 // :: ([*], [*]) -> [*]
-appendArray = function(a1, a2) {
+appendArray = (a1, a2) => {
   push.apply(a1, a2);
   return a1;
 };
 
 // Returns the number of own key/value pairs in the given object.
 // :: {} -> number
-objLength = function(obj) {
+objLength = (obj) => {
   return (Object.keys(obj)).length;
 };
 
 // Returns true if the given object has no own key/value pair.
 // :: {} -> boolean
-isEmpty = function(obj) {
+isEmpty = (obj) => {
   return objLength(obj) === 0;
 };
 
 // Function composition
-compose = function() {
+compose = () => {
   var fns;
   fns = toArray(arguments);
-  return function() {
+  return () => {
     var fn, result, _i;
     result = (fns.pop()).apply(null, arguments);
     for (_i = fns.length - 1; _i >= 0; _i += -1) {
@@ -112,8 +112,8 @@ compose = function() {
 // Call the given function if the last `n` elements of the `args` array are instances of `Obs`, otherwise return a
 // function which waits for more arguments to be appended on the current arguments.
 // (->, [*], number) -> ->
-waitForObs = function(fn, args, n) {
-  return function() {
+waitForObs = (fn, args, n) => {
+  return () => {
     var args2, i, len, _i, _j;
     args2 = appendArray(copyArray(args), arguments);
     len = args2.length;
@@ -132,35 +132,35 @@ waitForObs = function(fn, args, n) {
 
 // Return a function which calls the given function if its last `n` arguments are instances of Obs, otherwise return a
 // function which waits for more arguments to be appended on the given arguments.
-curryObs = function(n, fn) {
+curryObs = (n, fn) => {
   return waitForObs(fn, [], n);
 };
 
 // Call the given function if enough arguments are given, otherwise return function which waits for more arguments.
 // :: (->, [*]) -> *
-waitForArgs = function(fn, args) {
+waitForArgs = (fn, args) => {
   if (args.length >= fn.length) {
     return fn.apply(null, args);
   } else {
-    return function() {
+    return () => {
       return waitForArgs(fn, args.concat(toArray(arguments)));
     };
   }
 };
 
 // Function currying
-curry = function(fn) {
-  return function() {
+curry = (fn) => {
+  return () => {
     return waitForArgs(fn, toArray(arguments));
   };
 };
 
 // Returns a sequence generator function.
 // :: -> -> number
-createSequence = function() {
+createSequence = () => {
   var counter;
   counter = 0;
-  return function() {
+  return () => {
     return counter++;
   };
 };
@@ -182,7 +182,7 @@ obsListeners = {};
 // Add a new listener function for an existing observable.
 // Returns a function to deregister the listener.
 // :: (Observable, (T ->), (* ->), (->)) ->
-addListener = function(obs, onValue, onError, onEnd) {
+addListener = (obs, onValue, onError, onEnd) => {
   var deregister, lid, listeners;
   // Get listeners of observable
   listeners = obsListeners[obs._id];
@@ -200,7 +200,7 @@ addListener = function(obs, onValue, onError, onEnd) {
     onEnd: toFunc(onEnd)
   };
   // Return deregister function
-  return function() {
+  return () => {
     delete listeners[lid];
     if (isEmpty(listeners)) {
       delete obsListeners[obs._id];
@@ -212,7 +212,7 @@ addListener = function(obs, onValue, onError, onEnd) {
   };
 };
 
-removeListener = function(obs, lid) {};
+removeListener = (obs, lid) => {};
 
 // A function to be called on the start of each queue message generated by this type.
 // Can e.g. be used for debugging.
@@ -221,7 +221,7 @@ onNext = nop;
 
 // Iterate key/value pairs of an object
 // :: ((string -> *), ((string, *) ->)) ->
-iterate = function(obj, callback) {
+iterate = (obj, callback) => {
   var key, value;
   for (key in obj) {
     if (!__hasProp.call(obj, key)) {
@@ -234,9 +234,9 @@ iterate = function(obj, callback) {
 
 // Emit the given value on the observable with the given id.
 // :: string -> * ->
-trigger = curry(function(oid, value) {
+trigger = curry((oid, value) => {
   if (value !== void 0) {
-    iterate(obsListeners[oid], function(_, listener) {
+    iterate(obsListeners[oid], (_, listener) => {
       listener.onValue(value);
     });
   }
@@ -244,17 +244,17 @@ trigger = curry(function(oid, value) {
 
 // Emit the given error object on the observable with the given id.
 // :: string -> * ->
-triggerError = curry(function(oid, error) {
-  iterate(obsListeners[oid], function(_, listener) {
+triggerError = curry((oid, error) => {
+  iterate(obsListeners[oid], (_, listener) => {
     listener.onError(error);
   });
 });
 
 // End the observable with the given id.
 // :: string -> ->
-triggerEnd = function(oid) {
-  return function() {
-    iterate(obsListeners[oid], function(_, listener) {
+triggerEnd = (oid) => {
+  return () => {
+    iterate(obsListeners[oid], (_, listener) => {
       listener.onEnd();
     });
   };
@@ -262,30 +262,30 @@ triggerEnd = function(oid) {
 
 // Internal Observable constructor function
 // :: (->) -> Obs<T>
-Obs = function() {
+Obs = () => {
   this._id = observableId();
 };
 
 // Returns true if the given value is an observable
 // :: * -> boolean
-isObservable = function(obs) {
+isObservable = (obs) => {
   return obs instanceof Obs;
 };
 
 // Calls the given function with a push function to emit values on the given observable.
 // (Observable, (->)) -> Observable
-pushValues = function(obs, create) {
+pushValues = (obs, create) => {
   var checkEnd, id, msgCount, next, register;
   register = null;
   id = obs._id;
   msgCount = 0; // How much messages are in the queue for this observable
-  checkEnd = function() {
+  checkEnd = () => {
     if (register == null && msgCount === 0) { // No more messages in queue => end observable
       async(triggerEnd(id));
     }
   };
-  next = function(fn) {
-    async(function() {
+  next = (fn) => {
+    async(() => {
       var e;
       try {
         fn.call(obs);
@@ -308,14 +308,14 @@ pushValues = function(obs, create) {
 
 globals = {
   // ((A -> B), Observable<A>) -> Observable<B>
-  map: curryObs(1, function(obs, fn, seed) {
+  map: curryObs(1, (obs, fn, seed) => {
     var deregister, id, ob0, _trigger, _triggerError;
     ob0 = new Obs();
     id = ob0._id;
     _trigger = trigger(id);
     _triggerError = triggerError(id);
-    deregister = addListener(obs, function(value) {
-      async(function() {
+    deregister = addListener(obs, (value) => {
+      async(() => {
         var e;
         try {
           _trigger(fn(value));
@@ -324,26 +324,26 @@ globals = {
           _triggerError(e);
         }
       });
-    }, function(e) {
-      async(function() {
+    }, (e) => {
+      async(() => {
         _triggerError(e);
       });
-    }, function() {
+    }, () => {
       deregister();
       async(triggerEnd(id));
     });
     return ob0;
   }),
-  take: function(count, obs) {
+  take: (count, obs) => {
     var deregister, i, id, ob, _trigger, _triggerError;
     ob = new Obs();
     id = ob._id;
     _trigger = trigger(id);
     _triggerError = triggerError(id);
     i = 0; // Number of taken values
-    deregister = addListener(obs, function(value) {
+    deregister = addListener(obs, (value) => {
       if (i < count) {
-        async(function() {
+        async(() => {
           _trigger(value);
         });
       }
@@ -352,17 +352,17 @@ globals = {
         deregister();
         async(triggerEnd(id));
       }
-    }, function(e) {
-      async(function() {
+    }, (e) => {
+      async(() => {
         _triggerError(e);
       });
-    }, function() {
+    }, () => {
       deregister();
       async(triggerEnd(id));
     });
     return ob;
   },
-  filter: curryObs(1, function(obs, predicate) {
+  filter: curryObs(1, (obs, predicate) => {
     var deregister, elements, id, len, ob0, _trigger, _triggerError;
     ob0 = new Obs();
     id = ob0._id;
@@ -370,25 +370,25 @@ globals = {
     _triggerError = triggerError(id);
     len = predicate.length;
     elements = [];
-    deregister = addListener(obs, function(value) {
+    deregister = addListener(obs, (value) => {
       var e;
       try {
         if (isTrue(predicate(value))) {
-          async(function() {
+          async(() => {
             _trigger(value);
           });
         }
       } catch (_error) {
         e = _error;
-        async(function() {
+        async(() => {
           _triggerError(e);
         });
       }
-    }, function(e) {
-      async(function() {
+    }, (e) => {
+      async(() => {
         _triggerError(e);
       });
-    }, function() {
+    }, () => {
       deregister();
       async(triggerEnd(id));
     });
@@ -398,31 +398,31 @@ globals = {
 
 // Prototype for all Observables.
 Obs.prototype = obsProto = {
-  log: function(prefix) {
-    addListener(this, function(value) {
+  log: (prefix) => {
+    addListener(this, (value) => {
       log(prefix, value);
-    }, function(e) {
+    }, (e) => {
       error(prefix, e);
-    }, function() {
+    }, () => {
       log(prefix, "<end>");
     });
   },
-  forEach: function(onValue, onError, onEnd) {
+  forEach: (onValue, onError, onEnd) => {
     return addListener(this, onValue, onError, onEnd);
   },
-  map: function(fn) {
+  map: (fn) => {
     return globals.map(fn, this);
   },
-  filter: function(predicate) {
+  filter: (predicate) => {
     return globals.filter(predicate, this);
   },
-  take: function(count) {
+  take: (count) => {
     return globals.take(count, this);
   }
 };
 
 // Constructor function for a new Observable. It should be used without `new`.
-export default Observable = function(creator) {
+export default Observable = (creator) => {
   return pushValues(new Obs(), creator);
 };
 
@@ -430,22 +430,22 @@ Observable.prototype = obsProto; // For instanceof
 
 // Will be called at the start of each queue message created by this type
 // :: (->) ->
-Observable.onNext = function(callback) {
+Observable.onNext = (callback) => {
   onNext = toFunc(callback);
 };
 
 // Returns an observable which emits all elements of the given array.
 // :: [*] -> Observable
-Observable.fromArray = function(array) {
+Observable.fromArray = (array) => {
   array = array.slice(0); // Shallow copy array
-  return Observable(function(push, next) {
+  return Observable((push, next) => {
     var pushIfAvailable, pushNext;
-    pushIfAvailable = function() {
+    pushIfAvailable = () => {
       if (array.length > 0) {
         next(pushNext);
       }
     };
-    pushNext = function() {
+    pushNext = () => {
       push(array.shift());
       pushIfAvailable();
     };
@@ -453,12 +453,12 @@ Observable.fromArray = function(array) {
   });
 };
 
-Observable.once = function(value) {
+Observable.once = (value) => {
   return Observable.fromArray([value]);
 };
 
 // Copy all global functions to the exported object.
-iterate(globals, function(name, fn) {
+iterate(globals, (name, fn) => {
   Observable[name] = fn;
 });
 
