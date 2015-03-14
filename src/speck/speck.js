@@ -422,7 +422,7 @@ Obs.prototype = obsProto = {
 };
 
 // Constructor function for a new Observable. It should be used without `new`.
-Observable = function(creator) {
+export default Observable = function(creator) {
   return pushValues(new Obs(), creator);
 };
 
