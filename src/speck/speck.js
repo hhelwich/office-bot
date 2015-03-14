@@ -192,9 +192,9 @@ let obsListeners = {};
 // Returns a function to deregister the listener.
 // :: (Observable, (T ->), (* ->), (->)) ->
 let addListener = (obs, onValue, onError, onEnd) => {
-  let deregister, lid, listeners;
+  let deregister;
   // Get listeners of observable
-  listeners = obsListeners[obs._id];
+  let listeners = obsListeners[obs._id];
   if (listeners == null) {
     obsListeners[obs._id] = listeners = {};
     if (obs._reg != null) {
@@ -202,7 +202,7 @@ let addListener = (obs, onValue, onError, onEnd) => {
     }
   }
   // Add new listener
-  lid = listenerId();
+  let lid = listenerId();
   listeners[lid] = {
     onValue: toFunc(onValue),
     onError: toFunc(onError),
@@ -226,13 +226,11 @@ let removeListener = (obs, lid) => {};
 // Iterate key/value pairs of an object
 // :: ((string -> *), ((string, *) ->)) ->
 let iterate = (obj, callback) => {
-  let key, value;
-  for (key in obj) {
+  for (let key in obj) {
     if (!hasProp.call(obj, key)) {
       continue;
     }
-    value = obj[key];
-    callback(key, value);
+    callback(key, obj[key]);
   }
 };
 
@@ -267,16 +265,15 @@ let triggerEnd = (oid) => {
 // Calls the given function with a push function to emit values on the given observable.
 // (Observable, (->)) -> Observable
 let pushValues = (obs, create) => {
-  let checkEnd, id, msgCount, next, register;
-  register = null;
-  id = obs._id;
-  msgCount = 0; // How much messages are in the queue for this observable
-  checkEnd = () => {
+  let register = null;
+  let id = obs._id;
+  let msgCount = 0; // How much messages are in the queue for this observable
+  let checkEnd = () => {
     if (register == null && msgCount === 0) { // No more messages in queue => end observable
       async(triggerEnd(id));
     }
   };
-  next = (fn) => {
+  let next = (fn) => {
     async(() => {
       try {
         fn.call(obs);
@@ -299,12 +296,11 @@ let pushValues = (obs, create) => {
 let globals = {
   // ((A -> B), Observable<A>) -> Observable<B>
   map: curryObs(1, (obs, fn, seed) => {
-    let deregister, id, ob0, _trigger, _triggerError;
-    ob0 = new Obs();
-    id = ob0._id;
-    _trigger = trigger(id);
-    _triggerError = triggerError(id);
-    deregister = addListener(obs, (value) => {
+    let ob0 = new Obs();
+    let id = ob0._id;
+    let _trigger = trigger(id);
+    let _triggerError = triggerError(id);
+    let deregister = addListener(obs, (value) => {
       async(() => {
         try {
           _trigger(fn(value));
@@ -323,13 +319,12 @@ let globals = {
     return ob0;
   }),
   take: (count, obs) => {
-    let deregister, i, id, ob, _trigger, _triggerError;
-    ob = new Obs();
-    id = ob._id;
-    _trigger = trigger(id);
-    _triggerError = triggerError(id);
-    i = 0; // Number of taken values
-    deregister = addListener(obs, (value) => {
+    let ob = new Obs();
+    let id = ob._id;
+    let _trigger = trigger(id);
+    let _triggerError = triggerError(id);
+    let i = 0; // Number of taken values
+    let deregister = addListener(obs, (value) => {
       if (i < count) {
         async(() => {
           _trigger(value);
@@ -351,14 +346,13 @@ let globals = {
     return ob;
   },
   filter: curryObs(1, (obs, predicate) => {
-    let deregister, elements, id, len, ob0, _trigger, _triggerError;
-    ob0 = new Obs();
-    id = ob0._id;
-    _trigger = trigger(id);
-    _triggerError = triggerError(id);
-    len = predicate.length;
-    elements = [];
-    deregister = addListener(obs, (value) => {
+    let ob0 = new Obs();
+    let id = ob0._id;
+    let _trigger = trigger(id);
+    let _triggerError = triggerError(id);
+    let len = predicate.length;
+    let elements = [];
+    let deregister = addListener(obs, (value) => {
       try {
         if (isTrue(predicate(value))) {
           async(() => {
@@ -425,8 +419,8 @@ Observable.onNext = (callback) => {
 Observable.fromArray = (array) => {
   array = array.slice(0); // Shallow copy array
   return Observable((push, next) => {
-    let pushIfAvailable, pushNext;
-    pushIfAvailable = () => {
+    let pushNext;
+    let pushIfAvailable = () => {
       if (array.length > 0) {
         next(pushNext);
       }
