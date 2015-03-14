@@ -1,5 +1,7 @@
-var Obs, Observable, addListener, appendArray, async, bind, compose, copyArray, createSequence, curry, curryObs, error, globals, isEmpty, isFunc, isObservable, isTrue, iterate, listenerId, log, nop, objLength, obsListeners, obsProto, observableId, onNext, push, pushValues, removeListener, slice, toArray, toFunc, trigger, triggerEnd, triggerError, waitForArgs, waitForObs, _console, _ref,
-  __hasProp = {}.hasOwnProperty;
+var Obs, Observable, addListener, appendArray, async, bind, compose, copyArray, createSequence, curry, curryObs, error,
+  globals, isEmpty, isFunc, isObservable, isTrue, iterate, listenerId, log, nop, objLength, obsListeners, obsProto,
+  observableId, onNext, push, pushValues, removeListener, slice, toArray, toFunc, trigger, triggerEnd, triggerError,
+  waitForArgs, waitForObs, _console, _ref, __hasProp = {}.hasOwnProperty;
 
 bind = function(fn, context) {
   return function() {
@@ -13,13 +15,15 @@ log = bind(_console.log, _console);
 
 error = bind(_console.error, _console);
 
-_ref = Array.prototype, slice = _ref.slice, push = _ref.push;
+_ref = Array.prototype;
+slice = _ref.slice;
+push = _ref.push;
 
-if ((typeof TEST !== "undefined" && TEST !== null) && TEST) {
+if (typeof TEST !== "undefined" && TEST !== null && TEST) {
   console.log("test mode on");
 }
 
-if ((typeof DEBUG !== "undefined" && DEBUG !== null) && DEBUG) {
+if (typeof DEBUG !== "undefined" && DEBUG !== null && DEBUG) {
   console.log("debug mode on");
 }
 
@@ -28,10 +32,10 @@ isTrue = function(value) {
 };
 
 async = function(f) {
-  setTimeout((function() {
+  setTimeout(function() {
     onNext();
     return f();
-  }), 0);
+  }, 0);
 };
 
 nop = function() {};
@@ -66,7 +70,7 @@ objLength = function(obj) {
 };
 
 isEmpty = function(obj) {
-  return (objLength(obj)) === 0;
+  return objLength(obj) === 0;
 };
 
 compose = function() {
@@ -168,7 +172,9 @@ onNext = nop;
 iterate = function(obj, callback) {
   var key, value;
   for (key in obj) {
-    if (!__hasProp.call(obj, key)) continue;
+    if (!__hasProp.call(obj, key)) {
+      continue;
+    }
     value = obj[key];
     callback(key, value);
   }
@@ -210,7 +216,7 @@ pushValues = function(obs, create) {
   id = obs._id;
   msgCount = 0;
   checkEnd = function() {
-    if ((register == null) && msgCount === 0) {
+    if (register == null && msgCount === 0) {
       async(triggerEnd(id));
     }
   };
@@ -221,7 +227,7 @@ pushValues = function(obs, create) {
         fn.call(obs);
       } catch (_error) {
         e = _error;
-        (triggerError(id))(e);
+        triggerError(id)(e);
       }
       msgCount -= 1;
       checkEnd();
@@ -388,7 +394,7 @@ this.speck = {
   Observable: Observable
 };
 
-if ((typeof TEST !== "undefined" && TEST !== null) && TEST) {
+if (typeof TEST !== "undefined" && TEST !== null && TEST) {
   this.speck._private = {
     toArray: toArray,
     copyArray: copyArray,
