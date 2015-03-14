@@ -282,11 +282,9 @@ let pushValues = (obs, create) => {
   };
   next = (fn) => {
     async(() => {
-      let e;
       try {
         fn.call(obs);
-      } catch (_error) {
-        e = _error;
+      } catch (e) {
         triggerError(id)(e);
       }
       msgCount -= 1;
@@ -312,11 +310,9 @@ let globals = {
     _triggerError = triggerError(id);
     deregister = addListener(obs, (value) => {
       async(() => {
-        let e;
         try {
           _trigger(fn(value));
-        } catch (_error) {
-          e = _error;
+        } catch (e) {
           _triggerError(e);
         }
       });
@@ -367,15 +363,13 @@ let globals = {
     len = predicate.length;
     elements = [];
     deregister = addListener(obs, (value) => {
-      let e;
       try {
         if (isTrue(predicate(value))) {
           async(() => {
             _trigger(value);
           });
         }
-      } catch (_error) {
-        e = _error;
+      } catch (e) {
         async(() => {
           _triggerError(e);
         });
