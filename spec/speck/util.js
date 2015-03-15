@@ -8,7 +8,8 @@ var appendStrs, equalSize, fillLeft, hasData, initData, makeResultString, maxLen
 maxLength = function(strs) {
   var max, str, _i, _len;
   max = 0;
-  for (_i = 0, _len = strs.length; _i < _len; _i++) {
+  _len = strs.length;
+  for (_i = 0; _i < _len; _i++) {
     str = strs[_i];
     max = Math.max(max, str.length);
   }
@@ -18,7 +19,7 @@ maxLength = function(strs) {
 // Extend the string to the given size by adding spaces to the left.
 // (string, number) -> string
 fillLeft = function(str, size) {
-  return ((new Array(size - str.length + 1)).join(" ")) + str;
+  return new Array(size - str.length + 1).join(" ") + str;
 };
 
 // Make all strings in the given array of the same size by adding spaces on the left.
@@ -27,7 +28,8 @@ equalSize = function(strs) {
   var length, str, _i, _len, _results;
   length = maxLength(strs);
   _results = [];
-  for (_i = 0, _len = strs.length; _i < _len; _i++) {
+  _len = strs.length;
+  for (_i = 0; _i < _len; _i++) {
     str = strs[_i];
     _results.push(fillLeft(str, length));
   }
@@ -38,7 +40,8 @@ equalSize = function(strs) {
 // [[*]] -> boolean
 hasData = function(arrays) {
   var array, _i, _len;
-  for (_i = 0, _len = arrays.length; _i < _len; _i++) {
+  _len = arrays.length;
+  for (_i = 0; _i < _len; _i++) {
     array = arrays[_i];
     if (array.length > 0) {
       return true;
@@ -64,7 +67,8 @@ initData = function(n) {
 appendStrs = function(strs0, strs1) {
   var i, str0, _i, _len, _results;
   _results = [];
-  for (i = _i = 0, _len = strs0.length; _i < _len; i = ++_i) {
+  _len = strs0.length;
+  for (i = _i = 0; _i < _len; i = ++_i) {
     str0 = strs0[i];
     _results.push(str0.concat(strs1[i]));
   }
@@ -74,7 +78,7 @@ appendStrs = function(strs0, strs1) {
 // Returns true if the given substring is contained in the given string.
 // :: (string, string) -> boolean
 strContains = function(str, sub) {
-  return (str.indexOf(sub)) !== -1;
+  return str.indexOf(sub) !== -1;
 };
 
 // Throws if the given string is a problematic value to use together with this unit test utility function.
@@ -83,7 +87,8 @@ strContains = function(str, sub) {
 verifyStrValue = function(val) {
   var sub, _i, _len, _ref;
   _ref = " !,[]".split("");
-  for (_i = 0, _len = _ref.length; _i < _len; _i++) {
+  _len = _ref.length;
+  for (_i = 0; _i < _len; _i++) {
     sub = _ref[_i];
     if (strContains(val, sub)) {
       throw Error("invalid value " + val);
@@ -106,15 +111,16 @@ maybeStrToNumber = function(str) {
 // :: [[string]] -> string
 makeResultString = function(results) {
   var result;
-  return ((function() {
+  return (function() {
     var _i, _len, _results;
     _results = [];
-    for (_i = 0, _len = results.length; _i < _len; _i++) {
+    _len = results.length;
+    for (_i = 0; _i < _len; _i++) {
       result = results[_i];
       _results.push((result.join(" ")).trim());
     }
     return _results;
-  })()).join(" ");
+  }()).join(" ");
 };
 
 let util = {
@@ -125,14 +131,14 @@ let util = {
     var activeCount, callback, i, n, next, observable, observables, results, resultsNow, _fn, _i, _j, _len;
     observables = 2 <= arguments.length ? __slice.call(arguments, 0, _i = arguments.length - 1) : (_i = 0, []), callback = arguments[_i++];
     n = observables.length; // Number of observables
-    results = (function() { // List of results for each observable in the same order as in the inputs
+    results = function() { // List of results for each observable in the same order as in the inputs
       var _j, _results;
       _results = [];
       for (i = _j = 0; 0 <= n ? _j < n : _j > n; i = 0 <= n ? ++_j : --_j) {
         _results.push(["["]);
       }
       return _results;
-    })();
+    }();
     // List of all values/errors in the order of the occurrence. Same index of the lists imply occurrence in the same
     // stack. Stacks with no error/value will be dropped in the lists.
     resultsNow = initData(n); // :: [[string]]
@@ -142,15 +148,16 @@ let util = {
       var result;
       if (hasData(resultsNow)) {
         // Join event strings for each observable and make all strings the same length. Append to result list
-        results = appendStrs(results, equalSize((function() {
+        results = appendStrs(results, equalSize(function() {
           var _j, _len, _results;
           _results = [];
-          for (_j = 0, _len = resultsNow.length; _j < _len; _j++) {
+          _len = resultsNow.length;
+          for (_j = 0; _j < _len; _j++) {
             result = resultsNow[_j];
             _results.push(result.join(","));
           }
           return _results;
-        })()));
+        }()));
         resultsNow = initData(n); // Reset var to collect next stacks values/errors
       }
     };
@@ -159,7 +166,7 @@ let util = {
       observable.forEach(function(value) { // On value
         resultsNow[i].push(verifyStrValue("" + value));
       }, function(error) { // On error
-        resultsNow[i].push("!" + (verifyStrValue("" + error)));
+        resultsNow[i].push("!" + verifyStrValue("" + error));
       }, function() { // On end
         resultsNow[i].push("]");
         activeCount -= 1;
@@ -169,7 +176,8 @@ let util = {
         }
       });
     };
-    for (i = _j = 0, _len = observables.length; _j < _len; i = ++_j) {
+    _len = observables.length;
+    for (i = _j = 0; _j < _len; i = ++_j) {
       observable = observables[i];
       _fn(i);
     }
@@ -186,12 +194,11 @@ let util = {
         var value, _i, _len, _ref;
         if (events.length > 0) {
           _ref = events.shift().split(",");
-          for (_i = 0, _len = _ref.length; _i < _len; _i++) {
+          _len = _ref.length;
+          for (_i = 0; _i < _len; _i++) {
             value = _ref[_i];
-            if ((value.indexOf("!")) === 0) {
-              next(function() {
-                return next(nextGroup);
-              });
+            if (value.indexOf("!") === 0) {
+              foo();
               throw value.substring(1);
             } else {
               push(maybeStrToNumber(value));
@@ -199,6 +206,11 @@ let util = {
           }
           next(nextGroup);
         }
+      };
+      var foo = function() {
+        next(function() {
+          return next(nextGroup);
+        });
       };
       next(nextGroup);
     });

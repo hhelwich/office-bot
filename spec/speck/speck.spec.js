@@ -2,25 +2,24 @@ import util from "./util";
 import customMatchers from "./matcher";
 import O, { _private } from "./speck";
 
-var Observable, async, counter, dataOf;
+let { Observable, async, counter, dataOf } = util;
 
-dataOf = util.dataOf, Observable = util.Observable, async = util.async, counter = util.counter;
+describe("Observable", () => {
 
-describe("Observable", function() {
-  beforeEach(function() {
-    return jasmine.addMatchers(customMatchers);
+  beforeEach(() => {
+    jasmine.addMatchers(customMatchers);
   });
-  describe("constructor", function() {
-    it("is callable as function", function(done) {
-      var obs;
-      obs = O(function(push, next) {
-        next(function() {
+
+  describe("constructor", () => {
+    it("is callable as function", (done) => {
+      let obs = O((push, next) => {
+        next(() => {
           push(42);
         });
       });
-      (expect(obs)).toBeInstanceOf(O);
-      dataOf(obs, function(data) {
-        (expect(data)).toBe("[ 42 ]");
+      expect(obs).toBeInstanceOf(O);
+      dataOf(obs, (data) => {
+        expect(data).toBe("[ 42 ]");
         done();
       });
     });
@@ -33,7 +32,7 @@ describe("Observable", function() {
       });
       (expect(obs)).toBeInstanceOf(O);
       dataOf(obs, function(data) {
-        (expect(data)).toBe("[ 42 ]");
+        expect(data).toBe("[ 42 ]");
         done();
       });
     });
@@ -53,7 +52,7 @@ describe("Observable", function() {
       var obs;
       obs = O(function() {});
       dataOf(obs, function(data) {
-        (expect(data)).toBe("[ ]");
+        expect(data).toBe("[ ]");
         done();
       });
     });
@@ -71,7 +70,7 @@ describe("Observable", function() {
         });
       });
       dataOf(obs, function(data) {
-        (expect(data)).toBe("[ 11,12,42 33,77 ]");
+        expect(data).toBe("[ 11,12,42 33,77 ]");
         done();
       });
     });
@@ -83,13 +82,12 @@ describe("Observable", function() {
           next(function() {
             push(11);
             throw "foo";
-            push(33);
           });
           push(42);
         });
       });
       dataOf(obs, function(data) {
-        (expect(data)).toBe("[ 77,42 11,!foo ]");
+        expect(data).toBe("[ 77,42 11,!foo ]");
         done();
       });
     });
@@ -133,7 +131,7 @@ describe("Observable", function() {
         var o;
         o = O.fromArray([1, 2, 3, 4, 5]);
         return dataOf(o, function(data) {
-          (expect(data)).toBe("[ 1 2 3 4 5 ]");
+          expect(data).toBe("[ 1 2 3 4 5 ]");
           return done();
         });
       });
@@ -142,7 +140,7 @@ describe("Observable", function() {
         o1 = O.fromArray([1, 2, 3, 4, 5]);
         o2 = O.fromArray([6, 7, 8, 9]);
         return dataOf(o1, o2, function(data) {
-          (expect(data)).toBe("[ 1   2   3   4   5   ] [   6   7   8   9   ]");
+          expect(data).toBe("[ 1   2   3   4   5   ] [   6   7   8   9   ]");
           return done();
         });
       });
@@ -156,9 +154,9 @@ describe("Observable", function() {
         var o0, o1, o2;
         o0 = O.fromArray([1, 2, 3, 4]);
         o1 = O.filter(isNotTwo, o0);
-        o2 = (O.filter(isNotTwo))(o0); // also test currying
+        o2 = O.filter(isNotTwo)(o0); // also test currying
         return dataOf(o0, o1, o2, function(data) {
-          (expect(data)).toBe("[ 1     2 3     4     ] [   1       3     4     ] [     1       3     4     ]");
+          expect(data).toBe("[ 1     2 3     4     ] [   1       3     4     ] [     1       3     4     ]");
           return done();
         });
       });
@@ -170,7 +168,7 @@ describe("Observable", function() {
         };
         skipDuplicates = O.filter(isEqual);
         return dataOf(o, skipDuplicates(o), function(data) {
-          (expect(data)).toBe("[ 1   2   2 3   4   4 4 5   ] [   1   2     3   4       5   ]");
+          expect(data).toBe("[ 1   2   2 3   4   4 4 5   ] [   1   2     3   4       5   ]");
           return done();
         });
       });
@@ -180,7 +178,7 @@ describe("Observable", function() {
         var o;
         o = O.once(42);
         return dataOf(o, function(data) {
-          (expect(data)).toBe("[ 42 ]");
+          expect(data).toBe("[ 42 ]");
           return done();
         });
       });
@@ -198,34 +196,34 @@ describe("Observable", function() {
         o0 = O.fromArray([1, 2, 3, 4]);
         o = O.map(square, o0);
         return dataOf(o0, o, function(data) {
-          (expect(data)).toBe("[ 1   2   3        4    ] [   1   4   !ooops   16   ]");
+          expect(data).toBe("[ 1   2   3        4    ] [   1   4   !ooops   16   ]");
           return done();
         });
       });
       it("can be curried", function(done) {
         var o, o0;
         o0 = O.fromArray([1, 2, 3, 4]);
-        o = (O.map(square))(o0);
+        o = O.map(square)(o0);
         return dataOf(o0, o, function(data) {
-          (expect(data)).toBe("[ 1   2   3        4    ] [   1   4   !ooops   16   ]");
+          expect(data).toBe("[ 1   2   3        4    ] [   1   4   !ooops   16   ]");
           return done();
         });
       });
       it("keeps errors untouched", function(done) {
         var o, o0;
         o0 = Observable("1 2 !foo 4");
-        o = (O.map(square))(o0);
+        o = O.map(square)(o0);
         return dataOf(o0, o, function(data) {
-          (expect(data)).toBe("[ 1   2   !foo      4    ] [   1   4      !foo   16   ]");
+          expect(data).toBe("[ 1   2   !foo      4    ] [   1   4      !foo   16   ]");
           return done();
         });
       });
       it("make synchronous values/errors asynchronous", function(done) {
         var o, o0;
         o0 = Observable("1 2,3 4,!foo 6");
-        o = (O.map(square))(o0);
+        o = O.map(square)(o0);
         return dataOf(o0, o, function(data) {
-          (expect(data)).toBe("[ 1   2,3          4,!foo         6    ] [   1     4 !ooops        16 !foo   36   ]");
+          expect(data).toBe("[ 1   2,3          4,!foo         6    ] [   1     4 !ooops        16 !foo   36   ]");
           return done();
         });
       });
@@ -237,7 +235,7 @@ describe("Observable", function() {
         o0 = Observable("1 5 3 2,7 4,!foo !oops 11");
         o = O.map(add(o0));
         return dataOf(o0, o, function(data) {
-          (expect(data)).toBe("[ 1 5    3   2,7       4,!foo         !oops      11    ] [     -4   2     -1 -5        3 !foo       !oops    -7   ]");
+          expect(data).toBe("[ 1 5    3   2,7       4,!foo         !oops      11    ] [     -4   2     -1 -5        3 !foo       !oops    -7   ]");
           return done();
         });
       });
@@ -246,13 +244,13 @@ describe("Observable", function() {
       var o0;
       o0 = null;
       beforeEach(function() {
-        return o0 = Observable("0 1 2 3 !foo 5 6,7 8 9,!oops, 10");
+        o0 = Observable("0 1 2 3 !foo 5 6,7 8 9,!oops, 10");
       });
       it("takes values and ends", function(done) {
         var o;
         o = O.take(3, o0);
         return dataOf(o0, o, function(data) {
-          (expect(data)).toBe("[ 0   1   2     3 !foo 5 6,7 8 9,!oops 10 ] [   0   1   2 ]");
+          expect(data).toBe("[ 0   1   2     3 !foo 5 6,7 8 9,!oops 10 ] [   0   1   2 ]");
           return done();
         });
       });
@@ -260,7 +258,7 @@ describe("Observable", function() {
         var o;
         o = O.take(9, o0);
         return dataOf(o0, o, function(data) {
-          (expect(data)).toBe("[ 0   1   2   3   !foo      5   6,7     8   9,!oops     10 ] [   0   1   2   3      !foo   5     6 7   8         9 ]");
+          expect(data).toBe("[ 0   1   2   3   !foo      5   6,7     8   9,!oops     10 ] [   0   1   2   3      !foo   5     6 7   8         9 ]");
           return done();
         });
       });
@@ -268,7 +266,7 @@ describe("Observable", function() {
         var o;
         o = O.take(100, o0);
         return dataOf(o0, o, function(data) {
-          (expect(data)).toBe("[ 0   1   2   3   !foo      5   6,7     8   9,!oops         10    ] [   0   1   2   3      !foo   5     6 7   8         9 !oops    10   ]");
+          expect(data).toBe("[ 0   1   2   3   !foo      5   6,7     8   9,!oops         10    ] [   0   1   2   3      !foo   5     6 7   8         9 !oops    10   ]");
           return done();
         });
       });
@@ -277,7 +275,7 @@ describe("Observable", function() {
       var o0;
       o0 = null;
       beforeEach(function() {
-        return o0 = Observable("0 1 2 3 !foo 5 6,7 8 9,!oops, 10");
+        o0 = Observable("0 1 2 3 !foo 5 6,7 8 9,!oops, 10");
       });
       it("filters values (not errors)", function(done) {
         var isEven, o;
@@ -286,7 +284,7 @@ describe("Observable", function() {
         };
         o = O.filter(isEven, o0);
         return dataOf(o0, o, function(data) {
-          (expect(data)).toBe("[ 0   1 2   3 !foo      5 6,7   8   9,!oops       10    ] [   0     2        !foo       6   8         !oops    10   ]");
+          expect(data).toBe("[ 0   1 2   3 !foo      5 6,7   8   9,!oops       10    ] [   0     2        !foo       6   8         !oops    10   ]");
           return done();
         });
       });
@@ -300,7 +298,7 @@ describe("Observable", function() {
         };
         o = O.filter(isEven, o0);
         return dataOf(o0, o, function(data) {
-          (expect(data)).toBe("[ 0   1 2   3 !foo      5       6,7   8       9,!oops       10    ] [   0     2        !foo   !nooo     6   !nooo         !oops    10   ]");
+          expect(data).toBe("[ 0   1 2   3 !foo      5       6,7   8       9,!oops       10    ] [   0     2        !foo   !nooo     6   !nooo         !oops    10   ]");
           return done();
         });
       });
@@ -320,7 +318,7 @@ describe("Observable", function() {
         o0 = O.fromArray([1, 2, 3, 4]);
         o = o0.map(square);
         return dataOf(o0, o, function(data) {
-          (expect(data)).toBe("[ 1   2   3        4    ] [   1   4   !ooops   16   ]");
+          expect(data).toBe("[ 1   2   3        4    ] [   1   4   !ooops   16   ]");
           return done();
         });
       });
@@ -335,7 +333,7 @@ describe("Observable", function() {
         o0 = O.fromArray([1, 2, 3, 4]);
         o = o0.filter(isNotTwo);
         return dataOf(o0, o, function(data) {
-          (expect(data)).toBe("[ 1   2 3   4   ] [   1     3   4   ]");
+          expect(data).toBe("[ 1   2 3   4   ] [   1     3   4   ]");
           return done();
         });
       });
@@ -346,7 +344,7 @@ describe("Observable", function() {
         o0 = O.fromArray([1, 2, 3, 4]);
         o = o0.take(3);
         return dataOf(o0, o, function(data) {
-          (expect(data)).toBe("[ 1   2   3     4 ] [   1   2   3 ]");
+          expect(data).toBe("[ 1   2   3     4 ] [   1   2   3 ]");
           return done();
         });
       });
@@ -458,26 +456,26 @@ describe("Observable", function() {
         f0 = f(1);
         f1 = f0(2);
         f2 = f1(3);
-        (expect((f2(o1))(o2))).toEqual(expected);
-        (expect(f2(o1, o2))).toEqual(expected);
-        (expect((f1(3, o1))(o2))).toEqual(expected);
-        (expect(f1(3, o1, o2))).toEqual(expected);
+        expect(f2(o1)(o2)).toEqual(expected);
+        expect(f2(o1, o2)).toEqual(expected);
+        expect(f1(3, o1)(o2)).toEqual(expected);
+        expect(f1(3, o1, o2)).toEqual(expected);
         f1 = f0(2, 3);
-        (expect((f1(o1))(o2))).toEqual(expected);
-        (expect(f1(o1, o2))).toEqual(expected);
-        (expect((f0(2, 3, o1))(o2))).toEqual(expected);
-        (expect(f0(2, 3, o1, o2))).toEqual(expected);
+        expect(f1(o1)(o2)).toEqual(expected);
+        expect(f1(o1, o2)).toEqual(expected);
+        expect(f0(2, 3, o1)(o2)).toEqual(expected);
+        expect(f0(2, 3, o1, o2)).toEqual(expected);
         f0 = f(1, 2);
         f1 = f0(3);
-        (expect((f1(o1))(o2))).toEqual(expected);
-        (expect(f1(o1, o2))).toEqual(expected);
-        (expect((f0(3, o1))(o2))).toEqual(expected);
-        (expect(f0(3, o1, o2))).toEqual(expected);
+        expect(f1(o1)(o2)).toEqual(expected);
+        expect(f1(o1, o2)).toEqual(expected);
+        expect(f0(3, o1)(o2)).toEqual(expected);
+        expect(f0(3, o1, o2)).toEqual(expected);
         f0 = f(1, 2, 3);
-        (expect((f0(o1))(o2))).toEqual(expected);
-        (expect(f0(o1, o2))).toEqual(expected);
-        (expect((f(1, 2, 3, o1))(o2))).toEqual(expected);
-        return (expect(f(1, 2, 3, o1, o2))).toEqual(expected);
+        expect(f0(o1)(o2)).toEqual(expected);
+        expect(f0(o1, o2)).toEqual(expected);
+        expect(f(1, 2, 3, o1)(o2)).toEqual(expected);
+        expect(f(1, 2, 3, o1, o2)).toEqual(expected);
       });
     });
     describe("isFunc", function() {
@@ -487,7 +485,8 @@ describe("Observable", function() {
       return it("returns `false` if argument is not a function", function() {
         var v, _i, _len, _ref;
         _ref = [null, void 0, true, false, "", "0", " ", {}, []];
-        for (_i = 0, _len = _ref.length; _i < _len; _i++) {
+        _len = _ref.length;
+        for (_i = 0; _i < _len; _i++) {
           v = _ref[_i];
           (expect(_.isFunc(v))).toBe(false);
         }
@@ -501,7 +500,8 @@ describe("Observable", function() {
       return it("returns `false` if argument is not an observable", function() {
         var v, _i, _len, _ref;
         _ref = [null, void 0, true, false, "", "0", " ", {}, [], function() {}];
-        for (_i = 0, _len = _ref.length; _i < _len; _i++) {
+        _len = _ref.length;
+        for (_i = 0; _i < _len; _i++) {
           v = _ref[_i];
           (expect(_.isObservable(v))).toBe(false);
         }
