@@ -1,10 +1,12 @@
+import util from "./util";
+import customMatchers from "./matcher";
+import O, { _private } from "./speck";
+
 var Observable, async, counter, dataOf;
 
 dataOf = util.dataOf, Observable = util.Observable, async = util.async, counter = util.counter;
 
 describe("Observable", function() {
-  var O;
-  O = speck.Observable;
   beforeEach(function() {
     return jasmine.addMatchers(customMatchers);
   });
@@ -156,7 +158,7 @@ describe("Observable", function() {
           return done();
         });
       });
-      return it("can handle predicate function with more than one parameters", function(done) {
+      return xit("can handle predicate function with more than one parameters", function(done) {
         var isEqual, o, skipDuplicates;
         o = O.fromArray([1, 2, 2, 3, 4, 4, 4, 5]);
         isEqual = function(a, b) {
@@ -348,7 +350,7 @@ describe("Observable", function() {
   });
   return describe("white box tests", function() {
     var _;
-    _ = speck._private;
+    _ = _private;
     describe("toArrary", function() {
       return it("converts argument object to array", function() {
         var fn;

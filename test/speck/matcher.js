@@ -1,4 +1,4 @@
-this.customMatchers = {
+export default {
   toBeInstanceOf: function(util, customEqualityTesters) {
     return {
       compare: function(actual, expected) {

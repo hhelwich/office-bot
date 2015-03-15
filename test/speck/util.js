@@ -1,3 +1,5 @@
+import Observable from "./speck";
+
 var appendStrs, equalSize, fillLeft, hasData, initData, makeResultString, maxLength, maybeStrToNumber, strContains, verifyStrValue,
   __slice = [].slice;
 
@@ -95,7 +97,7 @@ makeResultString = function(results) {
   })()).join(" ");
 };
 
-this.util = {
+let util = {
   dataOf: function() {
     var activeCount, callback, i, n, next, observable, observables, results, resultsNow, _fn, _i, _j, _len;
     observables = 2 <= arguments.length ? __slice.call(arguments, 0, _i = arguments.length - 1) : (_i = 0, []), callback = arguments[_i++];
@@ -125,7 +127,7 @@ this.util = {
         resultsNow = initData(n);
       }
     };
-    speck.Observable.onNext(next);
+    Observable.onNext(next);
     _fn = function(i) {
       observable.forEach(function(value) {
         resultsNow[i].push(verifyStrValue("" + value));
@@ -148,7 +150,7 @@ this.util = {
   Observable: function(str) {
     var events;
     events = str.split(" ");
-    return speck.Observable(function(push, next) {
+    return Observable(function(push, next) {
       var nextGroup;
       nextGroup = function() {
         var value, _i, _len, _ref;
@@ -182,3 +184,5 @@ this.util = {
     };
   }
 };
+
+export default util;
