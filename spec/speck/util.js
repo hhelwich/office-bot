@@ -120,7 +120,7 @@ makeResultString = function(results) {
       _results.push((result.join(" ")).trim());
     }
     return _results;
-  }()).join(" ");
+  }()).join("");
 };
 
 let util = {
