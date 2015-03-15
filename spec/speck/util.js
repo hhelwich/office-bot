@@ -3,6 +3,8 @@ import Observable from "./speck";
 var appendStrs, equalSize, fillLeft, hasData, initData, makeResultString, maxLength, maybeStrToNumber, strContains, verifyStrValue,
   __slice = [].slice;
 
+// Get the maximum string length for the given array of strings
+// :: [string] -> number
 maxLength = function(strs) {
   var max, str, _i, _len;
   max = 0;
@@ -13,10 +15,14 @@ maxLength = function(strs) {
   return max;
 };
 
+// Extend the string to the given size by adding spaces to the left.
+// (string, number) -> string
 fillLeft = function(str, size) {
   return ((new Array(size - str.length + 1)).join(" ")) + str;
 };
 
+// Make all strings in the given array of the same size by adding spaces on the left.
+// :: [string] -> [string]
 equalSize = function(strs) {
   var length, str, _i, _len, _results;
   length = maxLength(strs);
@@ -28,6 +34,8 @@ equalSize = function(strs) {
   return _results;
 };
 
+// Returns true if one of the arrays in the given array is not empty.
+// [[*]] -> boolean
 hasData = function(arrays) {
   var array, _i, _len;
   for (_i = 0, _len = arrays.length; _i < _len; _i++) {
@@ -39,6 +47,8 @@ hasData = function(arrays) {
   return false;
 };
 
+// Returns array which contains the given number of empty arrays.
+// :: number -> [[]]
 initData = function(n) {
   var i, _i, _results;
   _results = [];
@@ -48,6 +58,9 @@ initData = function(n) {
   return _results;
 };
 
+// Appends the strings of the second argument to  the string lists of the first argument. Both arguments are assumed to
+// have the same length.
+// :: ([[string]], [string]) -> [[string]]
 appendStrs = function(strs0, strs1) {
   var i, str0, _i, _len, _results;
   _results = [];
@@ -58,10 +71,15 @@ appendStrs = function(strs0, strs1) {
   return _results;
 };
 
+// Returns true if the given substring is contained in the given string.
+// :: (string, string) -> boolean
 strContains = function(str, sub) {
   return (str.indexOf(sub)) !== -1;
 };
 
+// Throws if the given string is a problematic value to use together with this unit test utility function.
+// If no error is thrown the input value is returned.
+// :: string -> string
 verifyStrValue = function(val) {
   var sub, _i, _len, _ref;
   _ref = " !,[]".split("");
@@ -84,6 +102,8 @@ maybeStrToNumber = function(str) {
   }
 };
 
+// Create one string of all results.
+// :: [[string]] -> string
 makeResultString = function(results) {
   var result;
   return ((function() {
@@ -98,11 +118,14 @@ makeResultString = function(results) {
 };
 
 let util = {
+  // Collect all outputs of the given observables until all are ended and call the given callback with the result
+  // converted to string for better readability.
+  // :: (Observable<T>..., (string ->)) ->
   dataOf: function() {
     var activeCount, callback, i, n, next, observable, observables, results, resultsNow, _fn, _i, _j, _len;
     observables = 2 <= arguments.length ? __slice.call(arguments, 0, _i = arguments.length - 1) : (_i = 0, []), callback = arguments[_i++];
-    n = observables.length;
-    results = (function() {
+    n = observables.length; // Number of observables
+    results = (function() { // List of results for each observable in the same order as in the inputs
       var _j, _results;
       _results = [];
       for (i = _j = 0; 0 <= n ? _j < n : _j > n; i = 0 <= n ? ++_j : --_j) {
@@ -110,11 +133,15 @@ let util = {
       }
       return _results;
     })();
-    resultsNow = initData(n);
+    // List of all values/errors in the order of the occurrence. Same index of the lists imply occurrence in the same
+    // stack. Stacks with no error/value will be dropped in the lists.
+    resultsNow = initData(n); // :: [[string]]
+    // Number of the given observables which are not ended
     activeCount = n;
-    next = function() {
+    next = function() { // To be called at the start of a new stack
       var result;
       if (hasData(resultsNow)) {
+        // Join event strings for each observable and make all strings the same length. Append to result list
         results = appendStrs(results, equalSize((function() {
           var _j, _len, _results;
           _results = [];
@@ -124,20 +151,20 @@ let util = {
           }
           return _results;
         })()));
-        resultsNow = initData(n);
+        resultsNow = initData(n); // Reset var to collect next stacks values/errors
       }
     };
     Observable.onNext(next);
     _fn = function(i) {
-      observable.forEach(function(value) {
+      observable.forEach(function(value) { // On value
         resultsNow[i].push(verifyStrValue("" + value));
-      }, function(error) {
+      }, function(error) { // On error
         resultsNow[i].push("!" + (verifyStrValue("" + error)));
-      }, function() {
+      }, function() { // On end
         resultsNow[i].push("]");
         activeCount -= 1;
         if (activeCount === 0) {
-          next();
+          next(); // Make sure all values/errors are collected in the result list
           callback(makeResultString(results));
         }
       });
@@ -147,6 +174,9 @@ let util = {
       _fn(i);
     }
   },
+
+  // Returns an observable which emits all elements of the given array.
+  // :: [*] -> Observable
   Observable: function(str) {
     var events;
     events = str.split(" ");

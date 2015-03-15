@@ -98,13 +98,15 @@ describe("Observable", function() {
         var obs, order;
         order = counter();
         obs = O(function(push, next) {
-          (expect(order())).toBe(0);
-          return function() {
+          (expect(order())).toBe(0); // Constructor function is called synchronously
+          // Return register function
+          return function() { // Register function
             (expect(order())).toBe(3);
             async(function() {
               return push(42);
             });
-            return function() {
+            // Return de-register function
+            return function() { // All listeners have been removed => de-register
               (expect(order())).toBe(5);
               return done();
             };
@@ -114,9 +116,11 @@ describe("Observable", function() {
         async(function() {
           var removeListener;
           (expect(order())).toBe(2);
+          // Attach listener to observable => register function should be called
           removeListener = obs.forEach(function(v) {
             (expect(order())).toBe(4);
             (expect(v)).toBe(42);
+            // Remove single listener => de-register function should be called
             return removeListener();
           });
         });
@@ -152,7 +156,7 @@ describe("Observable", function() {
         var o0, o1, o2;
         o0 = O.fromArray([1, 2, 3, 4]);
         o1 = O.filter(isNotTwo, o0);
-        o2 = (O.filter(isNotTwo))(o0);
+        o2 = (O.filter(isNotTwo))(o0); // also test currying
         return dataOf(o0, o1, o2, function(data) {
           (expect(data)).toBe("[ 1     2 3     4     ] [   1       3     4     ] [     1       3     4     ]");
           return done();
