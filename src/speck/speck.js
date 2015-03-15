@@ -13,14 +13,6 @@ let error = bind(_console.error, _console);
 
 let { slice, push } = Array.prototype;
 
-if (typeof TEST !== "undefined" && TEST !== null && TEST) {
-  log("test mode on");
-}
-
-if (typeof DEBUG !== "undefined" && DEBUG !== null && DEBUG) {
-  log("debug mode on");
-}
-
 // Returns true if the given value is of type boolean and is true.
 // * -> boolean
 let isTrue = (value) => {
@@ -437,22 +429,16 @@ iterate(globals, (name, fn) => {
   Observable[name] = fn;
 });
 
-this.speck = {
-  Observable: Observable
-};
-
 // Export internals for white box tests
-if (typeof TEST !== "undefined" && TEST !== null && TEST) {
-  this.speck._private = {
-    toArray: toArray,
-    copyArray: copyArray,
-    appendArray: appendArray,
-    compose: compose,
-    curry: curry,
-    curryObs: curryObs,
-    isFunc: isFunc,
-    isObservable: isObservable
-  };
-}
+export const _private = {
+  toArray: toArray,
+  copyArray: copyArray,
+  appendArray: appendArray,
+  compose: compose,
+  curry: curry,
+  curryObs: curryObs,
+  isFunc: isFunc,
+  isObservable: isObservable
+};
 
 export default Observable;
