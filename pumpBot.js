@@ -24,7 +24,7 @@ var minTimeBetweenPumpRuns = 5 * 60 * 1000;
 // Maximum pump runs per day
 var maxPumpRunsPerDay = 3;
 
-// Pump run time in milliseconds (10 seconds)
+// Pump run time in milliseconds (5 seconds)
 var pumpRunTime = 5 * 1000;
 
 
