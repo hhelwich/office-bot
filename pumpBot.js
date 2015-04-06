@@ -1,6 +1,7 @@
 var b = require('octalbonescript');
 var Jetty = require("jetty");
 var tty = new Jetty(process.stdout);
+var exec = require('child_process').exec;
 
 // Clear the screen
 tty.reset().clear();
@@ -96,12 +97,29 @@ var isOkToStartPump = function() {
   return true;
 };
 
+var playAlarm = function(done) {
+  // Play alarm sound
+  exec('aplay /home/debian/office-bot/alarm.wav', function() {
+    // Errors are ignored
+  });
+  setTimeout(function() {
+    // Start to speak a little bit after alarm sound starts
+    exec('espeak -ven-scottish "Alarm! plant hydration level below ' +
+        Math.round(moistureThreshold * 100) + ' %" --stdout | aplay', function (error, stdout, stderr) {
+      // Errors are ignored
+      done();
+    });
+  }, 500);
+};
+
 // Run the pump if allowed by the given contraints.
 var runPumpIfAllowed = function() {
   if (isOkToStartPump()) {
-    pumpRuns.unshift(Date.now());
-    startPump();
-    setTimeout(stopPump, pumpRunTime);
+    playAlarm(function() {
+      pumpRuns.unshift(Date.now());
+      startPump();
+      setTimeout(stopPump, pumpRunTime);
+    });
   }
 };
 
