@@ -1,5 +1,5 @@
 var b = require('octalbonescript');
-var Jetty = require("jetty");
+var Jetty = require('jetty');
 var tty = new Jetty(process.stdout);
 var exec = require('child_process').exec;
 
@@ -8,7 +8,7 @@ tty.reset().clear();
 
 // Configuration
 
-var  pin = {
+var pin = {
   moisture: 'P9_39',
   pump: ['P8_14', 'P8_16']
 };
@@ -97,6 +97,7 @@ var isOkToStartPump = function() {
   return true;
 };
 
+// Play alarm sound/message and call the given callback if done.
 var playAlarm = function(done) {
   // Play alarm sound
   exec('aplay /home/debian/office-bot/alarm.wav', function() {
